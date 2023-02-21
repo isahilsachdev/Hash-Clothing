@@ -79,9 +79,11 @@ const deleteCloth = (payload) => {
 
 export const fetchCategories = (params) => (dispatch) => {
   dispatch(getClothRequest());
-  axiosApiCall(params ? `/${params}` : '/categories', 'get', null)
+  axiosApiCall(params ? `/product/${params}` : '/product/categories', 'get', null)
     .then((res) => {
-      dispatch(getClothSuccess(res.data));
+      const resp = params ? res.data.products : res.data.categories
+      console.log("resp", resp)
+      dispatch(getClothSuccess(resp));
     })
     .catch((err) =>{
       console.log(err, 'error')
@@ -94,6 +96,9 @@ export const postCartItem = data => (dispatch) => {
   axiosApiCall('/cart', 'post', data)
     .then((res) => {
       dispatch(addClothSuccess(res.data));
+      if (window.location.pathname === '/cart') { // update only when in cart page
+        dispatch(fetchCartItem());
+      }
     })
     .catch((err) =>{
       console.log(err, 'error')
@@ -105,7 +110,7 @@ export const fetchCartItem = (params) => (dispatch) => {
   dispatch(getCartRequest());
   axiosApiCall('/cart', 'get', null)
     .then((res) => {
-      dispatch(getCartSuccess(res.data));
+      dispatch(getCartSuccess(res.data.data));
     })
     .catch((err) =>{
       console.log(err, 'error')
@@ -121,13 +126,14 @@ export const deleteCartItem = (id) => (dispatch) => {
     })
 };
 
-export const deleteCartItemWithoutFetch = (id) => (dispatch) => {
-  axiosApiCall(`/cart/${id}`, 'delete', null)
-    .then((res) => {
-      dispatch(deleteCloth(res.data));
-    })
-};
-
 export const deleteAllCartItem = (items) => (dispatch) => {
-  return Promise.all(items.forEach(item => dispatch(deleteCartItemWithoutFetch(item))));
+  // return Promise.all(items.forEach(item => dispatch(deleteCartItemWithoutFetch(item))));
+}
+
+export const deleteAllCartItemForId = (item) => (dispatch) => {
+  axiosApiCall(`/cart/all/${item.item_id}`, 'delete', null)
+  .then((res) => {
+    dispatch(deleteCloth(res.data));
+    dispatch(fetchCartItem());
+  })
 }

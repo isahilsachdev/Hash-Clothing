@@ -10,20 +10,14 @@ import {
     RemoveButtonContainer,
     StyledRemoveButton,
 } from './checkoutItem.styles';
-import { useDispatch } from "react-redux";
-import { deleteCartItem } from '../../Redux/App/action';
 
-const CheckoutItem = ({ item, removeItem, addItem }) => {
+const CheckoutItem = ({ item, removeItem, addItem, deleteAllForId }) => {
     const { category, img, price, quantity } = item;
-    const dispatch = useDispatch();
-    const clearItem = item => {
-        dispatch(deleteCartItem(item?.id))
-    };
 
     return (
         <CheckoutItemContainer>
             <ImageContainer>
-                <StyledImage src={img[0]} alt='item' />
+                <StyledImage src={img} alt='item' />
             </ImageContainer>
             <StyledName>{category}</StyledName>
             <StyledQuantity>
@@ -34,14 +28,14 @@ const CheckoutItem = ({ item, removeItem, addItem }) => {
                         &#10094;
                     </StyledArrow>
                 )}
-                {quantity || 1} {/* fix this */}
+                {quantity}
                 <StyledArrow onClick={() => addItem(item)}> 
                     &#10095;
                 </StyledArrow>
             </StyledQuantity>
             <StyledPrice>${price}</StyledPrice>
             <RemoveButtonContainer>
-                <StyledRemoveButton onClick={() => clearItem(item)}>
+                <StyledRemoveButton onClick={() => deleteAllForId(item)}>
                     &#10005;
                 </StyledRemoveButton>
             </RemoveButtonContainer>
