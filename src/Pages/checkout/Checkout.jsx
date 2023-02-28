@@ -9,13 +9,43 @@ import {
     Notice,
     Total,
 } from './checkout.styles';
-import { deleteAllCartItem, deleteCartItem } from '../../Redux/App/action';
+import { deleteCartItem, postCartItem, deleteAllCartItemForId } from '../../Redux/App/action';
 import EmptyCart from '../../Components/EmptyCart/EmptyCart';
+import { StripeCheckoutForm } from './StripeCheckoutForm';
+
+const updateItemsWithQuantity = (data) => {
+    const obj = {};
+    data.forEach(i => {
+        if(!obj[i.item_id]) {
+            obj[i.item_id] = {...i}
+        } else {
+            obj[i.item_id] = {
+                ...obj[i.item_id],
+                quantity: obj[i.item_id].quantity + 1
+            }
+        }
+    })
+
+    const newArr = Object.keys(obj).map(key => obj[key])
+    return newArr;
+}
 
 const Checkout = ({ cartData }) => {
     const [totalAmount, setTotalAmount] = useState(null)
     const [showModal, setShowModal] = useState(false)
     const dispatch = useDispatch();
+
+    const removeItem = item => {
+        dispatch(deleteCartItem(item?.item_id))
+    };
+
+    const addItem = item => {
+        dispatch(postCartItem(item))
+    }
+
+    const deleteAllForId = item => {
+        dispatch(deleteAllCartItemForId(item))
+    }
 
     useEffect(() => {
         let total = 0;
@@ -25,68 +55,38 @@ const Checkout = ({ cartData }) => {
         setTotalAmount(total);
     }, [cartData])
 
-    useEffect(() => {
-        window.inai.initialize({
-            container_id: "inai-widget",
-            token: "46a7cf2e-15e3-4e77-bcbc-17681f18a605", // as documented above
-            order_id: "ord_2AnHnWAWeuLn3SWyJ3dltsRXSNB",    // as documented above
-            styles: { // documented below
-              container: {},
-              cta: {
-                "color": '#333',
-                "border": '1px solid #333'
-              }, 
-              errorText: {}
-            },
-            customer: {
-              email: "customer@example.com",
-              phoneNumber: "919876543210"
-            },
-            countryCode: 'USA',
-            ctaText: "Pay Now"
-        }).then((response) => {
-            console.log('response', response);
-            setShowModal(true);
-        }).catch(error => {
-            console.log('error', error);
-            setShowModal(true);
-        }).finally(() => {
-            const itemsArray = cartData.map(item => item.id);
-            dispatch(deleteAllCartItem(itemsArray));
-        });
-    }, [])
     return (
-        <CheckoutPageContainer>
-            <CheckoutHeader>
-                <HeaderBlock>
-                    <span>Product</span>
-                </HeaderBlock>
-                <HeaderBlock>
-                    <span>Category</span>
-                </HeaderBlock>
-                <HeaderBlock>
-                    <span>Quantity</span>
-                </HeaderBlock>
-                <HeaderBlock>
-                    <span>Price</span>
-                </HeaderBlock>
-                <HeaderBlock>
-                    <span>Remove</span>
-                </HeaderBlock>
-            </CheckoutHeader>
-            {cartData.map(item => (
-                <CheckoutItem key={item.name} item={item} />
-            ))}
-            <Total>
-                <span>TOTAL: ${totalAmount || 0}</span>
-            </Total>
-            {showModal && <EmptyCart />}
-            <div id="inai-widget"></div>
-            <Notice>
-                * Use the following test card for payment <br />
-                4242424242424242 - Exp: 01/20 - CVV: 123
-            </Notice>
-        </CheckoutPageContainer>
+        // <CheckoutPageContainer>
+        //     <CheckoutHeader>
+        //         <HeaderBlock>
+        //             <span>Product</span>
+        //         </HeaderBlock>
+        //         <HeaderBlock>
+        //             <span>Category</span>
+        //         </HeaderBlock>
+        //         <HeaderBlock>
+        //             <span>Quantity</span>
+        //         </HeaderBlock>
+        //         <HeaderBlock>
+        //             <span>Price</span>
+        //         </HeaderBlock>
+        //         <HeaderBlock>
+        //             <span>Remove</span>
+        //         </HeaderBlock>
+        //     </CheckoutHeader>
+        //     {updateItemsWithQuantity(cartData).map(item => (
+        //         <CheckoutItem key={item.name} item={item} addItem={addItem} removeItem={removeItem} deleteAllForId={deleteAllForId} />
+        //     ))}
+        //     <Total>
+        //         <span>TOTAL: ${totalAmount || 0}</span>
+        //     </Total>
+        //     {showModal && <EmptyCart />}
+        <StripeCheckoutForm />
+        //     <Notice>
+        //         * Use the following test card for payment <br />
+        //         4242424242424242 - Exp: 01/20 - CVV: 123
+        //     </Notice>
+        // </CheckoutPageContainer>
     )
 };
 

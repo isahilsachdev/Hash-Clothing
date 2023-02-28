@@ -10,6 +10,7 @@ const CollectionsOverview = lazy(() => import('../Components/Collection/Collecti
 const ItemOverview = lazy(() => import('../Pages/ItemOverview/ItemOverview'));
 const CartItems = lazy(() => import('../Pages/CartItems/CartItems'));
 const AboutPage = lazy(() => import('../Pages/AboutPage/AboutPage'));
+const UserAuth = lazy(() => import('../Pages/UserAuth/UserAuth'));
 
 export const RoutesPage = () => {
   return (
@@ -20,6 +21,7 @@ export const RoutesPage = () => {
             <Route exact path="/" element={<Home />}></Route>
             <Route path="*" element={<Home />}></Route>
             <Route exact path="/about" element={<AboutPage />} />
+            <Route exact path="/signin" element={<UserAuth />} />
             <Route exact path="/shop" element={<CollectionsOverview />} />
             <Route exact path="/shop/:id" element={<ItemOverview />} />
             <Route exact path="/cart" element={<CartItems />} />

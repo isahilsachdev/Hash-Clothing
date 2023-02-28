@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { fetchCartItem } from '../../Redux/App/action';
 import Spinner from '../../Components/Spinner/Spinner';
-import Checkout from '../checkout/Checkout';
+import Checkout from '../Checkout/Checkout';
 import EmptyCart from '../../Components/EmptyCart/EmptyCart';
-import { SuccessModal } from '../../Components/SuccessModal/SuccessModal';
 
 const CartItems = () => {
   const dispatch = useDispatch();
